@@ -1,0 +1,62 @@
+'use client';
+
+import type { Components } from '@json-render/react';
+import { catalog } from './catalog';
+
+/**
+ * THE IMPLEMENTATIONS. Ordinary React, one function per catalog entry.
+ *
+ * `Components<typeof catalog>` is the enforcement: the map must have exactly
+ * the catalog's component names, and each function's `props` is the output
+ * type of that entry's Zod schema. Rename a catalog key and this file breaks.
+ */
+export const components: Components<typeof catalog> = {
+  Page: ({ props, children }) => (
+    <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <h1 className="text-[17px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{props.title}</h1>
+      {props.subtitle ? <p className="mt-0.5 text-[13px] text-zinc-500 dark:text-zinc-400">{props.subtitle}</p> : null}
+      <div className="mt-4 flex flex-col gap-3">{children}</div>
+    </section>
+  ),
+
+  Stack: ({ props, children }) => (
+    <div
+      className={[
+        'flex min-w-0',
+        props.direction === 'row' ? 'flex-row items-center' : 'flex-col',
+        props.gap === 'sm' ? 'gap-1.5' : props.gap === 'lg' ? 'gap-5' : 'gap-3',
+      ].join(' ')}
+    >
+      {children}
+    </div>
+  ),
+
+  Heading: ({ props }) => {
+    const Tag = (['h2', 'h3', 'h4'] as const)[Number(props.level) - 1] ?? 'h3';
+    return (
+      <Tag
+        className={[
+          'font-semibold tracking-tight text-zinc-900 dark:text-zinc-100',
+          props.level === '1' ? 'text-[16px]' : props.level === '2' ? 'text-[14px]' : 'text-[13px]',
+        ].join(' ')}
+      >
+        {props.text}
+      </Tag>
+    );
+  },
+
+  Text: ({ props }) => (
+    <p
+      className={[
+        'text-[13px] leading-relaxed',
+        props.tone === 'muted'
+          ? 'text-zinc-500 dark:text-zinc-400'
+          : props.tone === 'danger'
+            ? 'text-red-600 dark:text-red-400'
+            : 'text-zinc-800 dark:text-zinc-200',
+      ].join(' ')}
+    >
+      {props.value ?? ''}
+    </p>
+  ),
+};
